@@ -53,6 +53,8 @@
     };
 ```
 
+
+
 # 合并两个有序数组
     1. 暴力循环法 --- 时间复杂度 O(m*n) 
     2. 双指针法  --- 时间复杂度 O(m+n) 
@@ -69,6 +71,8 @@
         }
     };
 ```
+
+
 
 # 两数之和
     1. 暴力枚举 --- 两层嵌套循环 --- 时间复杂度 O(n^2)
@@ -88,6 +92,8 @@
     };
 ```
 
+
+
 # 加一
     1. 使用栈+进位符 --- 时间复杂度 O(n)
     2. 反向遍历+进位符(在原数组上改) --- 时间复杂度 O(n)
@@ -105,6 +111,8 @@
         return digits;
     };
 ```
+
+
 
 # 设计循环双端队列
 
@@ -200,6 +208,60 @@
 ```
 
 
+
 # 接雨水
-    1. 暴力循环 --- 情况有点复杂
-    2. 
+    1. 暴力循环 --- 双层循环 ---找到对应index的左右边界 --- 时间复杂度 O(n^2)
+    2. 两次遍历，遍历出每个item的左右边界, 在遍历一次算出每个item可存的水量 --- 时间复杂度 O(n)
+    3. 利用栈，一次遍历 --- 时间复杂度 O(n)
+    4. 方法2优化版,双端夹逼 --- 找到对应index下相对的左右边界 --- 时间复杂度 O(n)
+```
+    方法2
+    var trap = function(height) {
+        if (height.length < 3) return 0;
+        const length = height.length, leftArr = [height[0]], rightArr = [height[length - 1]];
+
+        for(let i = 1; i < length; i++) {
+            leftArr.push((Math.max(leftArr[leftArr.length -1], height[i])));
+        }
+        for(let j = length - 2; j >= 0; j--) {
+            rightArr.push((Math.max(rightArr[rightArr.length -1], height[j])));
+        }
+
+        let area = 0;
+
+        for(let k = 0; k < length; k++) {
+            area += Math.min(leftArr[k], rightArr[length - k -1]) - height[k];
+        }
+        return area;
+    };  
+
+    方法3
+    var trap = function(height) {
+        if (height.length < 3) return 0;
+        const stack = [0], length = height.length;
+        let area = 0;
+        for(let i = 1; i < length; i++) {
+            while(height[stack[stack.length -1]] <= height[i]) {
+                const lastVal = height[stack.pop()];
+                if (stack.length === 0) {
+                    break;
+                }
+                area += (Math.min(height[i], height[stack[stack.length - 1]]) - lastVal) * (i - stack[stack.length - 1] -1);
+            }
+            stack.push(i)
+        }
+        return area;
+    };
+
+    方法4
+    var trap = function(height) {
+        if (height.length < 3) return 0;
+        let left = 0, right = height.length - 1, leftMaxValue = height[0], rightMaxValue = height[height.length - 1], area = 0; 
+
+        while(left < right) {
+            leftMaxValue < rightMaxValue ? (area += leftMaxValue - height[left++], leftMaxValue = Math.max(leftMaxValue, height[left])) : (area += rightMaxValue - height[right--], rightMaxValue = Math.max(rightMaxValue, height[right]));
+        }
+
+        return area;
+    };
+```
